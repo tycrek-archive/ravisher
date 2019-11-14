@@ -25,6 +25,7 @@ router.get('*.js', (req, res, next) => {
 });
 
 //TODO: Add routes!
+router.get('/', (_req, res, _next) => res.render('index'));
 
 // HTTP 404
 router.use((_req, res) => res.status(404).send(http._404));
