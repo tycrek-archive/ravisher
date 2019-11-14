@@ -3,6 +3,12 @@ const express = require('express');
 const app = express();
 
 app.enable('strict routing');
+
+app.use(require('express-basic-auth')({
+	challenge: true,
+	users: CONFIG.users
+}));
+
 app.use(require('compression')());
 app.use(require('helmet')());
 app.use(require('express-pino-logger')({ logger: log }));
