@@ -12,7 +12,7 @@ module.exports = {
 		icon: joinPath('../client/static/favicon.ico'),
 		static: joinPath('../client/static'),
 		images: joinPath('../client/images'),
-		views: joinPath('../client/views/pages'),
+		views: joinPath('../client/views'),
 		users: { 'ravisher': 'ravisheradmin' }
 	},
 	http: {
