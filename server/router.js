@@ -55,7 +55,13 @@ router.get('/api/:tool/:mode/:query', (req, res, next) => {
 		let params = mode === 'movies' ? movie_params : tv_params;
 		rarbg.search(query, params).then(data => res.send(data)).catch(err => res.send(err));
 	} else if (tool === 'download') {
-		res.send('Sure thing');
+		let savePath = mode === 'movies' ? '/mnt/media/Movies/' : '/mnt/media/TV_Shows/';
+		let auth = require('fs-extra').readJsonSync(path('auth.json'));
+		let qbt = qbapi.connect(auth.hostname, auth.username, auth.password);
+		qbt.add(query, savePath, (err) => {
+			if (err) log.warn(err);
+			res.send({ msg: err ? 'Error!' : 'Added!' });
+		});
 	} else {
 		next();
 	}

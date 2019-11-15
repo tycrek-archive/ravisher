@@ -1,4 +1,9 @@
-function switchSearchMode() { $('.search-switch').toggle(); }
+var isModeMovies = true;
+
+function switchSearchMode() {
+	$('.search-switch').toggle();
+	isModeMovies = !isModeMovies;
+}
 
 function search(mode) {
 	$('.result-row').remove();
@@ -57,8 +62,6 @@ function parseResults(json) {
 		flags += atmos ? 'A, ' : '';
 		flags += d3 ? '3D, ' : '';
 
-		if (bluray) console.log(t);
-
 
 		// Audio //
 		let audio;
@@ -78,17 +81,17 @@ function parseResults(json) {
 		else score += V_FORMATS.length - V_FORMATS.indexOf(video);
 
 
-		let downloadButton = `<button onclick="download(btoa(${result.download}))">Add</button>`;
+		let downloadButton = `<button onclick="download('${btoa(result.download)}');">Add</button>`;
 		let row = `
 		<tr id="${count}-media" class="result-row">
-			<td>${downloadButton}</td>
-			<td>${t.split(`.${video}`)[0].replace(/\./g, ' ')}</td>
-			<td>${video.includes('.') ? video.substring(0, video.length - 1) : video}</td>
-			<td>${audio.includes('.') ? audio.substring(0, audio.length - 1) : audio}</td>
-			<td>${nFormatter(result.size)}</td>
-			<td>${result.seeders}</td>
-			<td id="${count}-score">${score}</td>
-			<td>${flags}</td>
+		<td style="text-align: left;">${t.split(`.${video}`)[0].replace(/\./g, ' ')}</td>
+		<td>${video.includes('.') ? video.substring(0, video.length - 1) : video}</td>
+		<td>${audio.includes('.') ? audio.substring(0, audio.length - 1) : audio}</td>
+		<td>${nFormatter(result.size)}</td>
+		<td>${result.seeders}</td>
+		<td id="${count}-score">${score}</td>
+		<td>${flags.substring(0, flags.length - 2)}</td>
+		<td>${downloadButton}</td>
 		</tr>`;
 		$('#results-table tr:last').after(row);
 
@@ -110,6 +113,13 @@ function sortTable() {
 		row.remove();
 		$('#results-table tr:first').after(row);
 	});
+}
+
+function download(magnet) {
+	let mode = isModeMovies ? 'movies' : 'tv';
+	fetch(`/api/download/${mode}/${magnet}`)
+		.then(res => res.json())
+		.then(json => alert(json.msg));
 }
 
 const bytes = {
