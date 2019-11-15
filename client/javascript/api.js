@@ -36,11 +36,12 @@ function parseResults(json) {
 	if (json.error_code && json.error_code == 20) return alert('No results found!');
 
 	const V_FORMATS = ['2160p', '1080p', '720p'];
-	const A_FORMATS = ['Atmos', '7.1.', '5.1.', 'AAC'];
+	const A_FORMATS = ['Atmos', '7.1', '5.1', 'AAC'];
 
 	count = 0;
 	json.forEach(result => {
 		let t = result.title;
+		console.log(t);
 		let score = 0;
 		let flags = '';
 
@@ -85,8 +86,8 @@ function parseResults(json) {
 		let row = `
 		<tr id="${count}-media" class="result-row">
 		<td style="text-align: left;">${t.split(`.${video}`)[0].replace(/\./g, ' ')}</td>
-		<td>${video.includes('.') ? video.substring(0, video.length - 1) : video}</td>
-		<td>${audio.includes('.') ? audio.substring(0, audio.length - 1) : audio}</td>
+		<td>${video}</td>
+		<td>${audio}</td>
 		<td>${nFormatter(result.size)}</td>
 		<td>${result.seeders}</td>
 		<td id="${count}-score">${score}</td>
