@@ -1,5 +1,5 @@
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs-extra');
 const pino = require('pino')({
 	prettyPrint: process.env.NODE_ENV === 'production' ? false : true
 });
@@ -20,7 +20,11 @@ module.exports = {
 		_500: '<title>500 - Internal server error</title><center><br><br><h1>500 - Internal server error</h1></center>'
 	},
 	btoa: (s) => Buffer.from(s).toString('base64'),
-	atob: (s) => Buffer.from(s, 'base64').toString()
+	atob: (s) => Buffer.from(s, 'base64').toString(),
+	sass: {
+		file: joinPath('../client/sass/main.scss'),
+		outputStyle: 'compressed'
+	}
 };
 
 function joinPath(file) {
