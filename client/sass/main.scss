@@ -1,6 +1,15 @@
+@import 'variables';
+@import 'mixins';
+@import 'normalize';
+@import 'responsive';
+
 .col-6 {
   padding-left: 32px;
   padding-right: 32px;
+}
+
+#help {
+  text-align: left;
 }
 
 body {

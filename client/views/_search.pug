@@ -1,33 +1,39 @@
-h2#searchTitle Search Movies
-button(onclick='switchSearchMode()').search-switch Switch to TV search
-button(onclick='switchSearchMode()' hidden).search-switch Switch to Movie search
-br
-br
-form(onsubmit='search(0); return false').search-switch#moviesForm
-	span Title:
-	input(type='text')#moviesTitle
-	br
-	br
-	span Year:
-	input(type='number')#moviesYear
-	br
-	br
-	input(type='submit', value='Search')
+.row
+	.col-6
+		h2#searchTitle Search Movies
+		button(onclick='switchSearchMode()').search-switch Switch to TV search
+		button(onclick='switchSearchMode()' hidden).search-switch Switch to Movie search
+		br
+		br
+		form(onsubmit='search(0); return false').search-switch#moviesForm
+			span Title:
+			input(type='text')#moviesTitle
+			br
+			br
+			span Year:
+			input(type='number')#moviesYear
+			br
+			br
+			input(type='submit', value='Search')
 
-form(onsubmit='search(1); return false' hidden).search-switch#tvForm
-	span Title:
-	input(type='text')#tvTitle
-	br
-	br
-	span Season:
-	input(type='number')#tvSeason
-	br
-	br
-	span Episode:
-	input(type='number')#tvEpisode
-	br
-	br
-	input(type='submit', value='Search')
+		form(onsubmit='search(1); return false' hidden).search-switch#tvForm
+			span Title:
+			input(type='text')#tvTitle
+			br
+			br
+			span Season:
+			input(type='number')#tvSeason
+			br
+			br
+			span Episode:
+			input(type='number')#tvEpisode
+			br
+			br
+			input(type='submit', value='Search')
+	.col-6#help
+		h3 Tips
+		ul
+			li Here
 br
 br
 #results(hidden)
