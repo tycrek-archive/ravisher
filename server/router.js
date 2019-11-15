@@ -58,6 +58,7 @@ router.get('/api/:tool/:mode/:query', (req, res, next) => {
 		let savePath = mode === 'movies' ? '/mnt/media/Movies/' : '/mnt/media/TV_Shows/';
 		let auth = require('fs-extra').readJsonSync(path('auth.json'));
 		let qbt = qbapi.connect(auth.hostname, auth.username, auth.password);
+		log.info(`Torrent added: ${query}`);
 		qbt.add(query, savePath, (err) => {
 			if (err) log.warn(err);
 			res.send({ msg: err ? 'Error!' : 'Added!' });
