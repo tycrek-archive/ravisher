@@ -53,7 +53,7 @@ router.get('/api/:tool/:mode/:query', (req, res, next) => {
 
 	if (tool === 'search') {
 		let params = mode === 'movies' ? movie_params : tv_params;
-		rarbg.search(query, params).then(data => res.send(data))
+		rarbg.search(query, params).then(data => res.send(data)).catch(err => res.send(err));
 	} else if (tool === 'download') {
 		res.send('Sure thing');
 	} else {

@@ -14,5 +14,7 @@ function search(mode) {
 }
 
 function parseResults(json) {
-	alert(JSON.stringify(json));
+	if (json.error_code && json.error_code == 20) return alert('No results found!');
+
+	console.log(json);
 }
