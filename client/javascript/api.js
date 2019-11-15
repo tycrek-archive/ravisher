@@ -7,10 +7,23 @@ function search(mode) {
 		let year = $('#moviesYear').val();
 
 		let search = btoa(title + ' ' + year);
-
 		fetch(`/api/search/movies/${search}`)
-			.then((res) => res.json())
-			.then((json) => parseResults(json));
+			.then(res => res.json())
+			.then(json => parseResults(json));
+	} else {
+		let title = $('#tvTitle').val();
+		let season = $('#tvSeason').val();
+		let episode = $('#tvEpisode').val();
+
+		if (season.length > 0) season = 'S' + season;
+		if (episode.length > 0) episode = 'E' + episode;
+		if (season.length == 2) season = season.replace('S', 'S0');
+		if (episode.length == 2) episode = episode.replace('E', 'E0');
+
+		let search = btoa(`${title} ${season + episode}`);
+		fetch(`/api/search/tv/${search}`)
+			.then(res => res.json())
+			.then(json => parseResults(json));
 	}
 }
 
@@ -36,11 +49,11 @@ function parseResults(json) {
 		score += hevc ? 1 : 0;
 		score += tenbit ? 1 : 0;
 		score += atmos ? 1 : 0;
-		flags += (bluray ? 'BD, ' : '');
-		flags += (remux ? 'R, ' : '');
-		flags += (hevc ? 'H, ' : '');
-		flags += (tenbit ? '10, ' : '');
-		flags += (atmos ? 'A, ' : '');
+		flags += bluray ? 'BD, ' : '';
+		flags += remux ? 'R, ' : '';
+		flags += hevc ? 'H, ' : '';
+		flags += tenbit ? '10, ' : '';
+		flags += atmos ? 'A, ' : '';
 
 
 		// Audio //
@@ -70,7 +83,7 @@ function parseResults(json) {
 			<td>${audio.includes('.') ? audio.substring(0, audio.length - 1) : audio}</td>
 			<td>${nFormatter(result.size)}</td>
 			<td>${result.seeders}</td>
-			<td>${score}</td>
+			<td id="${count}-score">${score}</td>
 			<td>${flags}</td>
 		</tr>`;
 		$('#results-table tr:last').after(row);
@@ -78,21 +91,17 @@ function parseResults(json) {
 		$('#results').show();
 		count++;
 	});
-}
 
-/*
-Title
-Video
-Audio
-Size
-Seeders
-*/
+	$('.result-row').each(index => {
+		console.log(index + ': ' + $(`#${index}-score`).text());
+	})
+}
 
 const bytes = {
 	giga: 1073741824,
 	mega: 1048576,
 	kilo: 1024
-}
+};
 function nFormatter(num) {
 	if (num >= bytes.giga) {
 		return (num / bytes.giga).toFixed(2).replace(/\.0$/, '') + ' GB';
