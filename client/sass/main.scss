@@ -3,13 +3,14 @@
 @import 'normalize';
 @import 'responsive';
 
-.col-6 {
+.col {
   padding-left: 32px;
   padding-right: 32px;
 }
 
 #help {
   text-align: left;
+  padding-left: 4em;
 }
 
 body {
