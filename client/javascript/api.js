@@ -44,6 +44,7 @@ function parseResults(json) {
 		let hevc = t.includes('HEVC') ? true : false;
 		let tenbit = t.includes('10bit') ? true : false;
 		let atmos = t.includes('Atmos') ? true : false;
+		let d3 = t.includes('3D') ? true : false;
 		score += bluray ? 1 : 0;
 		score += remux ? 1 : 0;
 		score += hevc ? 1 : 0;
@@ -54,6 +55,9 @@ function parseResults(json) {
 		flags += hevc ? 'H, ' : '';
 		flags += tenbit ? '10, ' : '';
 		flags += atmos ? 'A, ' : '';
+		flags += d3 ? '3D, ' : '';
+
+		if (bluray) console.log(t);
 
 
 		// Audio //
@@ -76,7 +80,7 @@ function parseResults(json) {
 
 		let downloadButton = `<button onclick="download(btoa(${result.download}))">Add</button>`;
 		let row = `
-		<tr class="result-row">
+		<tr id="${count}-media" class="result-row">
 			<td>${downloadButton}</td>
 			<td>${t.split(`.${video}`)[0].replace(/\./g, ' ')}</td>
 			<td>${video.includes('.') ? video.substring(0, video.length - 1) : video}</td>
@@ -92,9 +96,20 @@ function parseResults(json) {
 		count++;
 	});
 
-	$('.result-row').each(index => {
-		console.log(index + ': ' + $(`#${index}-score`).text());
-	})
+	sortTable();
+}
+
+function sortTable() {
+	let scores = {};
+	$('.result-row').each(index => scores[index] = $(`#${index}-score`).text());
+
+	let sorted = Object.keys(scores).sort((a, b) => scores[a] - scores[b]);
+
+	sorted.forEach(count => {
+		let row = $(`#${count}-media`);
+		row.remove();
+		$('#results-table tr:first').after(row);
+	});
 }
 
 const bytes = {
