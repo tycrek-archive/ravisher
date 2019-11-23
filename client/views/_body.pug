@@ -14,6 +14,9 @@
 		br
 		br
 		input(type='submit', value='Search')
+		span &nbsp;
+		input(type='checkbox' name='movieCheck')#moviesDesperate
+		em &nbsp;Desperate mode
 	form(onsubmit='search(1); return false' hidden).search-switch#tvForm
 		span Title:
 		input(type='text')#tvTitle
@@ -28,6 +31,9 @@
 		br
 		br
 		input(type='submit', value='Search')
+		span &nbsp;
+		input(type='checkbox' name='tvCheck')#tvDesperate
+		em &nbsp;Desperate mode
 	hr
 	#help
 		h3 Tips
