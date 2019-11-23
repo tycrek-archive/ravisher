@@ -9,13 +9,17 @@ const router = require('express').Router();
 module.exports = router;
 
 const movie_params = {
-	category: [44, 45, 50, 51, 51, 42, 46],
+	// X264_FHD, X264_HD, BD_RE, X264_3D, XVID_HD, X264_4k, X265_4k, X265_4kHDR
+	category: [44, 45, 46, 47, 48, 50, 51, 52],
+	// XVID, X264, FULLBD
+	category2: [14, 17, 42],
 	limit: 100,
 	sort: 'seeders',
 	min_seeders: 2,
 	min_leechers: null,
 	format: 'json_extended',
 	ranked: null,
+	savePath: '/mnt/media/Movies/'
 };
 
 const tv_params = {
@@ -26,6 +30,7 @@ const tv_params = {
 	min_leechers: null,
 	format: 'json_extended',
 	ranked: null,
+	savePath: '/mnt/media/TV_Shows/'
 };
 
 // Compile and compress Sass
