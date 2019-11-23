@@ -50,17 +50,20 @@ function parseResults(json) {
 		let remux = t.includes('REMUX') ? true : false;
 		let hevc = t.includes('HEVC') ? true : false;
 		let tenbit = t.includes('10bit') ? true : false;
+		let hdr = t.includes('HDR') ? true : false;
 		let atmos = t.includes('Atmos') ? true : false;
 		let d3 = t.includes('3D') ? true : false;
 		score += bluray ? 1 : 0;
 		score += remux ? 1 : 0;
 		score += hevc ? 1 : 0;
 		score += tenbit ? 1 : 0;
+		score += hdr ? 1 : 0;
 		score += atmos ? 1 : 0;
 		flags += bluray ? 'BD, ' : '';
 		flags += remux ? 'R, ' : '';
 		flags += hevc ? 'H, ' : '';
 		flags += tenbit ? '10, ' : '';
+		flags += hdr ? 'HDR, ' : '';
 		flags += atmos ? 'A, ' : '';
 		flags += d3 ? '3D, ' : '';
 
