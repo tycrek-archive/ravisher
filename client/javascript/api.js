@@ -7,14 +7,11 @@ function switchSearchMode() {
 
 function search(mode) {
 	$('.result-row').remove();
+	let search, type, desperate;
 	if (mode == 0) {
-		let title = $('#moviesTitle').val();
-		let year = $('#moviesYear').val();
-
-		let search = btoa(title + ' ' + year);
-		fetch(`/api/search/movies/${search}`)
-			.then(res => res.json())
-			.then(json => parseResults(json));
+		type = 'movies';
+		search = btoa($('#moviesTitle').val() + ' ' + $('#moviesYear').val());
+		desperate = $('#moviesDesperate').is(':checked');
 	} else {
 		let title = $('#tvTitle').val();
 		let season = $('#tvSeason').val();
@@ -25,11 +22,15 @@ function search(mode) {
 		if (season.length == 2) season = season.replace('S', 'S0');
 		if (episode.length == 2) episode = episode.replace('E', 'E0');
 
-		let search = btoa(`${title} ${season + episode}`);
-		fetch(`/api/search/tv/${search}`)
-			.then(res => res.json())
-			.then(json => parseResults(json));
+		type = 'tv';
+		search = btoa(`${title} ${season + episode}`);
+		desperate = $('#tvDesperate').is(':checked');
 	}
+
+	let query = `/api/search/${type}/${search}?desperate=${desperate}`;
+	fetch(query)
+		.then(res => res.json())
+		.then(json => parseResults(json));
 }
 
 function parseResults(json) {

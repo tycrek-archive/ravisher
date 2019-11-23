@@ -53,23 +53,33 @@ router.get('/', (_req, res, _next) => res.render('index'));
 
 router.get('/api/:tool/:mode/:query', (req, res, next) => {
 	let tool = req.params.tool;
-	let mode = req.params.mode;
+	let movies = req.params.mode === 'movies';
 	let query = atob(req.params.query);
+	let desperate = req.query.desperate === 'true';
 
-	if (tool === 'search') {
-		let params = mode === 'movies' ? movie_params : tv_params;
+	tool === 'search' ? search(movies, query, desperate) : tool === 'download' ? download(movies, query) : next();
+
+	function search(movies, query, desperate) {
+		let temp_p = movies ? movie_params : tv_params;
+		let params = {};
+
+		for (prop in temp_p) params[prop] = temp_p[prop];
+
+		if (desperate && movies) params.category = movie_params.category.concat(movie_params.category2);
+		if (desperate) params.min_seeders = null;
+
 		rarbg.search(query, params).then(data => res.send(data)).catch(err => res.send(err));
-	} else if (tool === 'download') {
-		let savePath = mode === 'movies' ? '/mnt/media/Movies/' : '/mnt/media/TV_Shows/';
+	}
+
+	function download(movies, query) {
+		let savePath = movies ? movie_params.savePath : tv_params.savePath;
 		let auth = require('fs-extra').readJsonSync(path('auth.json'));
 		let qbt = qbapi.connect(auth.hostname, auth.username, auth.password);
 		log.info(`Torrent added: ${query}`);
-		qbt.add(query, savePath, (err) => {
+		qbt.add(query, savePath, err => {
 			if (err) log.warn(err);
 			res.send({ msg: err ? 'Error!' : 'Added!' });
 		});
-	} else {
-		next();
 	}
 });
 
