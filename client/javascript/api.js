@@ -7,14 +7,11 @@ function switchSearchMode() {
 
 function search(mode) {
 	$('.result-row').remove();
+	let search, type, desperate;
 	if (mode == 0) {
-		let title = $('#moviesTitle').val();
-		let year = $('#moviesYear').val();
-
-		let search = btoa(title + ' ' + year);
-		fetch(`/api/search/movies/${search}`)
-			.then(res => res.json())
-			.then(json => parseResults(json));
+		type = 'movies';
+		search = btoa($('#moviesTitle').val() + ' ' + $('#moviesYear').val());
+		desperate = $('#moviesDesperate').is(':checked');
 	} else {
 		let title = $('#tvTitle').val();
 		let season = $('#tvSeason').val();
@@ -25,11 +22,15 @@ function search(mode) {
 		if (season.length == 2) season = season.replace('S', 'S0');
 		if (episode.length == 2) episode = episode.replace('E', 'E0');
 
-		let search = btoa(`${title} ${season + episode}`);
-		fetch(`/api/search/tv/${search}`)
-			.then(res => res.json())
-			.then(json => parseResults(json));
+		type = 'tv';
+		search = btoa(`${title} ${season + episode}`);
+		desperate = $('#tvDesperate').is(':checked');
 	}
+
+	let query = `/api/search/${type}/${search}?desperate=${desperate}`;
+	fetch(query)
+		.then(res => res.json())
+		.then(json => parseResults(json));
 }
 
 function parseResults(json) {
@@ -45,24 +46,17 @@ function parseResults(json) {
 		let score = 0;
 		let flags = '';
 
-		let bluray = t.includes('BluRay') ? true : false;
-		let remux = t.includes('REMUX') ? true : false;
-		let hevc = t.includes('HEVC') ? true : false;
-		let tenbit = t.includes('10bit') ? true : false;
-		let atmos = t.includes('Atmos') ? true : false;
-		let d3 = t.includes('3D') ? true : false;
-		score += bluray ? 1 : 0;
-		score += remux ? 1 : 0;
-		score += hevc ? 1 : 0;
-		score += tenbit ? 1 : 0;
-		score += atmos ? 1 : 0;
-		flags += bluray ? 'BD, ' : '';
-		flags += remux ? 'R, ' : '';
-		flags += hevc ? 'H, ' : '';
-		flags += tenbit ? '10, ' : '';
-		flags += atmos ? 'A, ' : '';
-		flags += d3 ? '3D, ' : '';
+		const FLAGS = {
+			'BluRay': 'BR',
+			'REMUX': 'Re',
+			'HEVC': 'HEVC',
+			'10bit': '10b',
+			'HDR': 'HDR',
+			'Atmos': 'A',
+			'3D': '3D'
+		};
 
+		for (let key in FLAGS) if (t.includes(key)) (score += 1, flags += `${FLAGS[key]}, `);
 
 		// Audio //
 		let audio;

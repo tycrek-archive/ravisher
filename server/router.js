@@ -9,13 +9,17 @@ const router = require('express').Router();
 module.exports = router;
 
 const movie_params = {
-	category: [44, 45, 50, 51, 51, 42, 46],
+	// X264_FHD, X264_HD, BD_RE, X264_3D, XVID_HD, X264_4k, X265_4k, X265_4kHDR
+	category: [44, 45, 46, 47, 48, 50, 51, 52],
+	// XVID, X264, FULLBD
+	category2: [14, 17, 42],
 	limit: 100,
 	sort: 'seeders',
 	min_seeders: 2,
 	min_leechers: null,
 	format: 'json_extended',
 	ranked: null,
+	savePath: '/mnt/media/Movies/'
 };
 
 const tv_params = {
@@ -26,6 +30,7 @@ const tv_params = {
 	min_leechers: null,
 	format: 'json_extended',
 	ranked: null,
+	savePath: '/mnt/media/TV_Shows/'
 };
 
 // Compile and compress Sass
@@ -48,23 +53,33 @@ router.get('/', (_req, res, _next) => res.render('index'));
 
 router.get('/api/:tool/:mode/:query', (req, res, next) => {
 	let tool = req.params.tool;
-	let mode = req.params.mode;
+	let movies = req.params.mode === 'movies';
 	let query = atob(req.params.query);
+	let desperate = req.query.desperate === 'true';
 
-	if (tool === 'search') {
-		let params = mode === 'movies' ? movie_params : tv_params;
+	tool === 'search' ? search(movies, query, desperate) : tool === 'download' ? download(movies, query) : next();
+
+	function search(movies, query, desperate) {
+		let temp_p = movies ? movie_params : tv_params;
+		let params = {};
+
+		for (prop in temp_p) params[prop] = temp_p[prop];
+
+		if (desperate && movies) params.category = movie_params.category.concat(movie_params.category2);
+		if (desperate) params.min_seeders = null;
+
 		rarbg.search(query, params).then(data => res.send(data)).catch(err => res.send(err));
-	} else if (tool === 'download') {
-		let savePath = mode === 'movies' ? '/mnt/media/Movies/' : '/mnt/media/TV_Shows/';
+	}
+
+	function download(movies, query) {
+		let savePath = movies ? movie_params.savePath : tv_params.savePath;
 		let auth = require('fs-extra').readJsonSync(path('auth.json'));
 		let qbt = qbapi.connect(auth.hostname, auth.username, auth.password);
 		log.info(`Torrent added: ${query}`);
-		qbt.add(query, savePath, (err) => {
+		qbt.add(query, savePath, err => {
 			if (err) log.warn(err);
 			res.send({ msg: err ? 'Error!' : 'Added!' });
 		});
-	} else {
-		next();
 	}
 });
 

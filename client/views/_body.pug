@@ -14,6 +14,9 @@
 		br
 		br
 		input(type='submit', value='Search')
+		span &nbsp;
+		input(type='checkbox' name='movieCheck')#moviesDesperate
+		em &nbsp;Desperate mode
 	form(onsubmit='search(1); return false' hidden).search-switch#tvForm
 		span Title:
 		input(type='text')#tvTitle
@@ -28,6 +31,9 @@
 		br
 		br
 		input(type='submit', value='Search')
+		span &nbsp;
+		input(type='checkbox' name='tvCheck')#tvDesperate
+		em &nbsp;Desperate mode
 	hr
 	#help
 		h3 Tips
@@ -47,10 +53,11 @@
 		span The more seeders, the better. Try to go for <b>at least 5 or 10 seeders</b>.
 		h4 Flags
 		ul
-			li BD: BluRay rip
-			li R : Remuxed BluRay rip
-			li H : HEVC encoding
-			li 10: 10-bit video
+			li BR: BluRay rip
+			li Re : Remuxed BluRay rip
+			li HEHV : HEVC encoding
+			li 10b: 10-bit video
+			li HDR: High dynamic range
 			li A : Dolby Atmos audio
 			li 3D: 3D video file
 .col-8.col: center
