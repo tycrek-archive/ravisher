@@ -7,27 +7,21 @@ function switchSearchMode() {
 
 function search(mode) {
 	$('.result-row').remove();
-	let search, type, desperate;
+	let search, type;
 	if (mode == 0) {
 		type = 'movies';
-		search = btoa($('#moviesTitle').val() + ' ' + $('#moviesYear').val());
-		desperate = $('#moviesDesperate').is(':checked');
+		search = btoa(`${$('#moviesTitle').val()} ${$('#moviesYear').val()}`);
 	} else {
-		let title = $('#tvTitle').val();
-		let season = $('#tvSeason').val();
-		let episode = $('#tvEpisode').val();
-
+		type = 'tv';
+		let title = $('#tvTitle').val(), season = $('#tvSeason').val(), episode = $('#tvEpisode').val();
 		if (season.length > 0) season = 'S' + season;
 		if (episode.length > 0) episode = 'E' + episode;
 		if (season.length == 2) season = season.replace('S', 'S0');
 		if (episode.length == 2) episode = episode.replace('E', 'E0');
-
-		type = 'tv';
 		search = btoa(`${title} ${season + episode}`);
-		desperate = $('#tvDesperate').is(':checked');
 	}
 
-	let query = `/api/search/${type}/${search}?desperate=${desperate}`;
+	let query = `/api/search/${type}/${search}?desperate=${$(`#${type}Desperate`).is(':checked')}`;
 	fetch(query)
 		.then(res => res.json())
 		.then(json => parseResults(json));
@@ -36,64 +30,35 @@ function search(mode) {
 function parseResults(json) {
 	if (json.error_code && json.error_code == 20) return alert('No results found!');
 
-	const V_FORMATS = ['2160p', '1080p', '720p'];
-	const A_FORMATS = ['Atmos', '7.1', '5.1', 'AAC'];
+	const FORMATS = [['2160p', '1080p', '720p'], ['Atmos', '7.1', '5.1', 'AAC']];
+	const FLAGS = ['BluRay', 'REMUX', 'HEVC', '10bit', 'HDR', 'Atmos', '3D'];
 
-	count = 0;
 	json.forEach(result => {
-		let t = result.title;
-		console.log(t);
-		let score = 0;
-		let flags = '';
+		console.log(result.title); // Mainly for debugging but it's nice to have
 
-		const FLAGS = {
-			'BluRay': 'BR',
-			'REMUX': 'Re',
-			'HEVC': 'HEVC',
-			'10bit': '10b',
-			'HDR': 'HDR',
-			'Atmos': 'A',
-			'3D': '3D'
-		};
+		let t = result.title, score = 0, flags = '', formats = [];
+		FLAGS.forEach(flag => { if (t.includes(flag)) (score += 1, flags += `${flag}, `); });
+		for (let i in FORMATS) {
+			FORMATS[i].forEach(format => { if (!formats[i] && t.includes(format)) formats[i] = format; });
+			if (!formats[i]) formats[i] = i == 0 ? '?' : 'Stereo';
+			else score += FORMATS[i].length - FORMATS[i].indexOf(formats[i]);
+		}
 
-		for (let key in FLAGS) if (t.includes(key)) (score += 1, flags += `${FLAGS[key]}, `);
-
-		// Audio //
-		let audio;
-		A_FORMATS.forEach(format => {
-			if (!audio && t.includes(format)) audio = format;
-		});
-		if (!audio) audio = 'Stereo';
-		else score += A_FORMATS.length - A_FORMATS.indexOf(audio);
-
-
-		// Video //
-		let video;
-		V_FORMATS.forEach(format => {
-			if (!video && t.includes(format)) video = format;
-		});
-		if (!video) video = '?';
-		else score += V_FORMATS.length - V_FORMATS.indexOf(video);
-
-
-		let downloadButton = `<button onclick="download('${btoa(result.download)}');">Add</button>`;
-		let row = `
-		<tr id="${count}-media" class="result-row">
-		<td style="text-align: left;">${t.split(`.${video}`)[0].replace(/\./g, ' ')}</td>
-		<td>${video}</td>
-		<td>${audio}</td>
-		<td>${nFormatter(result.size)}</td>
-		<td>${result.seeders}</td>
-		<td id="${count}-score">${score}</td>
-		<td>${flags.substring(0, flags.length - 2)}</td>
-		<td>${downloadButton}</td>
-		</tr>`;
-		$('#results-table tr:last').after(row);
+		score = Math.round(score);
+		$('#results-table tr:last').after(`
+			<tr id="${json.indexOf(result)}-media" class="result-row">
+			<td style="text-align: left;">${t.split(`.${formats[0]}`)[0].replace(/\./g, ' ')}</td>
+			<td>${formats[0]}</td>
+			<td>${formats[1]}</td>
+			<td>${nFormatter(result.size)}</td>
+			<td>${result.seeders}</td>
+			<td id="${json.indexOf(result)}-score">${score}</td>
+			<td style="text-align: left;">${flags.substring(0, flags.length - 2)}</td>
+			<td><button onclick="download('${btoa(result.download)}');">Add</button></td>
+			</tr>`);
 
 		$('#results').show();
-		count++;
 	});
-
 	sortTable();
 }
 
@@ -102,7 +67,6 @@ function sortTable() {
 	$('.result-row').each(index => scores[index] = $(`#${index}-score`).text());
 
 	let sorted = Object.keys(scores).sort((a, b) => scores[a] - scores[b]);
-
 	sorted.forEach(count => {
 		let row = $(`#${count}-media`);
 		row.remove();
@@ -111,26 +75,15 @@ function sortTable() {
 }
 
 function download(magnet) {
-	let mode = isModeMovies ? 'movies' : 'tv';
-	fetch(`/api/download/${mode}/${magnet}`)
+	fetch(`/api/download/${isModeMovies ? 'movies' : 'tv'}/${magnet}`)
 		.then(res => res.json())
 		.then(json => alert(json.msg));
 }
 
-const bytes = {
-	giga: 1073741824,
-	mega: 1048576,
-	kilo: 1024
-};
+const bytes = { giga: 1073741824, mega: 1048576, kilo: 1024 };
 function nFormatter(num) {
-	if (num >= bytes.giga) {
-		return (num / bytes.giga).toFixed(2).replace(/\.0$/, '') + ' GB';
-	}
-	if (num >= bytes.mega) {
-		return (num / bytes.mega).toFixed(2).replace(/\.0$/, '') + ' MB';
-	}
-	if (num >= bytes.kilo) {
-		return (num / bytes.kilo).toFixed(2).replace(/\.0$/, '') + ' KB';
-	}
+	if (num >= bytes.giga) return (num / bytes.giga).toFixed(2).replace(/\.0$/, '') + ' GB';
+	if (num >= bytes.mega) return (num / bytes.mega).toFixed(2).replace(/\.0$/, '') + ' MB';
+	if (num >= bytes.kilo) return (num / bytes.kilo).toFixed(2).replace(/\.0$/, '') + ' KB';
 	return num;
 }
