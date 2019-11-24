@@ -35,9 +35,7 @@ const tv_params = {
 
 // Compile and compress Sass
 router.get('/css', (_req, res, next) => {
-	Sass.render(sass, (err, result) => {
-		err ? next(err) : res.type('css').send(result.css);
-	});
+	Sass.render(sass, (err, result) => err ? next(err) : res.type('css').send(result.css));
 });
 
 // Compress all JavaScript files using Uglify-ES

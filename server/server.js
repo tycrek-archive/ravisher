@@ -21,6 +21,4 @@ app.use(require('./router'));
 app.set('views', CONFIG.views);
 app.set('view engine', 'pug');
 
-app.listen(CONFIG.port, () => {
-	log.info(`Server hosted (0.0.0.0:${CONFIG.port})`);
-});
+app.listen(CONFIG.port, () => log.info(`Server hosted (0.0.0.0:${CONFIG.port})`));
