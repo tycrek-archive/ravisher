@@ -8,7 +8,10 @@ A good looking search tool for Rarbg that directly adds to qBittorrent.
 - [x] Add directly to qBittorrent
 - [x] Torrent name parsing
 - [ ] Highlight optimal torrent
-- [ ] "Desperate mode" (remove high quality filter)
+- [x] "Desperate mode" (remove high quality filter)
+- [ ] Options to search from 1337x and TPB
+- [ ] Notify when new TV episode or movie is available
+- [ ] Change table sorting
 
 ## Installation
 
